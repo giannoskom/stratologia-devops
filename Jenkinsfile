@@ -19,8 +19,14 @@ pipeline {
         stage('2. Syntax & Build Check') {
             steps {
                 echo 'Έλεγχος συντακτικού της Python...'
-                // Ο Jenkins τρέχει ένα γρήγορο compile check για να δει αν ξέχασες άνω-κάτω τελείες
-                sh 'python3 -m py_compile app.py'
+                sh '''
+                    if ! command -v python3 >/dev/null 2>&1; then
+                        echo "⚠️ Δεν βρέθηκε Python3! Έναρξη αυτόματης εγκατάστασης..."
+                        apt-get update -y && apt-get install -y python3
+                    fi
+                    
+                    python3 -m py_compile app.py
+                '''
             }
         }
 
