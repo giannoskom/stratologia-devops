@@ -1,4 +1,4 @@
-import base64 #yeye
+import base64
 import json
 import os
 import smtplib

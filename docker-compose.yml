@@ -49,6 +49,18 @@ services:
     depends_on:
       - db
 
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: stratologia_jenkins
+    restart: always
+    user: root
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+
 volumes:
   pgdata:
   keycloak_data:
+  jenkins_data:
