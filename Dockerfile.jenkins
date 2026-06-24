@@ -1,0 +1,12 @@
+FROM jenkins/jenkins:lts-jdk17
+
+# Γινόμαστε προσωρινά root ΜΟΝΟ κατά το χτίσιμο του image
+USER root
+
+# Εγκαθιστούμε την Python3 και το επίσημο, πανάλαφρο Docker CLI
+RUN apt-get update && \
+    apt-get install -y python3 docker.io && \
+    rm -rf /var/lib/apt/lists/*
+
+# Ξανακλειδώνουμε το image στον ασφαλή, απλό χρήστη jenkins
+USER jenkins

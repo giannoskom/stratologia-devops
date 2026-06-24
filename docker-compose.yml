@@ -50,17 +50,20 @@ services:
       - db
 
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins  # <--- Του λέμε να διαβάσει τη δική μας συνταγή!
     container_name: stratologia_jenkins
     restart: always
-    user: jenkins
+    user: jenkins                     # <--- Ασφαλής χρήστης
+    group_add:
+      - "1000"                        # <--- Το GID του Γιάννη!
     ports:
       - "8081:8080"
       - "50000:50000"
     volumes:
       - jenkins_data:/var/jenkins_home
-      - /home/giannos/.docker/desktop/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
+      - /home/giannos/.docker/desktop/docker.sock:/var/run/docker.sock
 
 volumes:
   pgdata:
