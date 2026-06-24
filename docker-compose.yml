@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: stratologia_db
+    restart: always
+    environment:
+      POSTGRES_USER: stratologia_user
+      POSTGRES_PASSWORD: stratologia_pass
+      POSTGRES_DB: stratologia_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: stratologia_keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: stratologia_mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  
+  api:
+    build: . 
+    container_name: stratologia_api
+    restart: always
+    environment:
+      - DB_HOST=db 
+      - DB_PORT=5432
+      - DB_NAME=stratologia_db
+      - DB_USER=stratologia_user
+      - DB_PASS=stratologia_pass
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+      - KEYCLOAK_BACKEND_URL=http://keycloak:8080
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+  keycloak_data:
