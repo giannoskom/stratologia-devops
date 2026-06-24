@@ -53,13 +53,13 @@ services:
     image: jenkins/jenkins:lts-jdk17
     container_name: stratologia_jenkins
     restart: always
-    user: root
+    user: jenkins
     ports:
       - "8081:8080"
       - "50000:50000"
     volumes:
       - jenkins_data:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/giannos/.docker/desktop/docker.sock
       - /usr/bin/docker:/usr/bin/docker
 
 volumes:
