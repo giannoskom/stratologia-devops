@@ -1,0 +1,32 @@
+---
+- name: Εγκατάσταση Υποδομής Stratologia στο Kubernetes
+  hosts: k8s_cluster
+  gather_facts: false
+
+  tasks:
+    - name: 1. Έλεγχος επικοινωνίας με K8s
+      command: microk8s status
+      changed_when: false
+
+    - name: 2. Deploy PostgreSQL (PVC, Deployment, Service)
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/postgres.yaml
+        namespace: default
+
+    - name: 3. Deploy Keycloak
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/keycloak.yaml
+        namespace: default
+
+    - name: 4. Deploy Mailhog
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/mailhog.yaml
+        namespace: default
+    - name: 5. Deploy Stratologia API
+      kubernetes.core.k8s:
+        state: present
+        src: manifests/api.yaml
+        namespace: default

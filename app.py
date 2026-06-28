@@ -23,9 +23,9 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", 1025))
 APP_BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:5000")
 
 # --- KEYCLOAK CONFIGURATION ---
-KEYCLOAK_CLIENT_ID = "stratologia-app"
+KEYCLOAK_CLIENT_ID = "stratologia"
 KEYCLOAK_CLIENT_SECRET = os.getenv(
-    "KEYCLOAK_CLIENT_SECRET", "tWPJ6V3sdVeEOtl24twZ9Im2TW8WhB6a"
+    "KEYCLOAK_CLIENT_SECRET", "pb0YRkeFRFkXK7kj6foiyXtJp8Yi3mmL"
 )
 KEYCLOAK_REALM = "stratologia-realm"
 

@@ -1,0 +1,61 @@
+---
+# 1. Η ΑΙΤΗΣΗ ΓΙΑ ΣΚΛΗΡΟ ΔΙΣΚΟ (Persistent Volume Claim)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# 2. ΤΟ CONTAINER (Deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stratologia-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stratologia-db
+  template:
+    metadata:
+      labels:
+        app: stratologia-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "stratologia_user"
+            - name: POSTGRES_PASSWORD
+              value: "stratologia_pass"
+            - name: POSTGRES_DB
+              value: "stratologia_db"
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+
+---
+# 3. Ο ΤΗΛΕΦΩΝΗΤΗΣ (Service)
+apiVersion: v1
+kind: Service
+metadata:
+  name: stratologia-db
+spec:
+  selector:
+    app: stratologia-db
+  ports:
+    - port: 5432
+      targetPort: 5432

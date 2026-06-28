@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stratologia-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stratologia-api
+  template:
+    metadata:
+      labels:
+        app: stratologia-api
+    spec:
+      containers:
+        - name: api
+          image: giannoskomninos/stratologia-api:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_HOST
+              value: "stratologia-db"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "stratologia_db"
+            - name: DB_USER
+              value: "stratologia_user"
+            - name: DB_PASS
+              value: "stratologia_pass"
+            - name: SMTP_HOST
+              value: "stratologia-mailhog"
+            - name: SMTP_PORT
+              value: "1025"
+            - name: APP_BASE_URL
+              value: "http://localhost:5000"
+            - name: KEYCLOAK_AUTH_URL
+              value: "http://localhost:8080"
+            - name: KEYCLOAK_BACKEND_URL
+              value: "http://stratologia-keycloak:8080"
+            - name: KEYCLOAK_CLIENT_SECRET
+              value: "pb0YRkeFRFkXK7kj6foiyXtJp8Yi3mmL"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stratologia-api
+spec:
+  selector:
+    app: stratologia-api
+  ports:
+    - port: 5000
+      targetPort: 5000

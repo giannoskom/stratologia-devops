@@ -1,0 +1,60 @@
+---
+# 1. ΑΙΤΗΣΗ ΓΙΑ ΔΙΣΚΟ (PVC)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: keycloak-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# 2. ΤΟ CONTAINER (Deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stratologia-keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stratologia-keycloak
+  template:
+    metadata:
+      labels:
+        app: stratologia-keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:24.0.1
+          args: ["start-dev"]
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+          volumeMounts:
+            - name: keycloak-storage
+              mountPath: /opt/keycloak/data
+      volumes:
+        - name: keycloak-storage
+          persistentVolumeClaim:
+            claimName: keycloak-pvc
+
+---
+# 3. Ο ΤΗΛΕΦΩΝΗΤΗΣ (Service)
+apiVersion: v1
+kind: Service
+metadata:
+  name: stratologia-keycloak
+spec:
+  selector:
+    app: stratologia-keycloak
+  ports:
+    - port: 8080
+      targetPort: 8080

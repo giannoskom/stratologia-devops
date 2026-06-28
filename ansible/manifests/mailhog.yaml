@@ -1,0 +1,41 @@
+---
+# 1. ΤΟ CONTAINER (Deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stratologia-mailhog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stratologia-mailhog
+  template:
+    metadata:
+      labels:
+        app: stratologia-mailhog
+    spec:
+      containers:
+        - name: mailhog
+          image: mailhog/mailhog:latest
+          ports:
+            - name: smtp
+              containerPort: 1025
+            - name: http
+              containerPort: 8025
+
+---
+# 2. Ο ΔΙΠΛΟΣ ΤΗΛΕΦΩΝΗΤΗΣ (Service)
+apiVersion: v1
+kind: Service
+metadata:
+  name: stratologia-mailhog
+spec:
+  selector:
+    app: stratologia-mailhog
+  ports:
+    - name: smtp-port
+      port: 1025
+      targetPort: 1025
+    - name: web-ui-port
+      port: 8025
+      targetPort: 8025
