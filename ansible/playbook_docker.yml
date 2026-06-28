@@ -1,0 +1,30 @@
+---
+- name: Εγκατάσταση Stratologia σε Docker Environment
+  hosts: docker_servers
+  become: true
+
+  tasks:
+    - name: 1. Εγκατάσταση Docker & Docker Compose Plugin
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose-v2
+        state: present
+        update_cache: true
+
+    - name: 2. Δημιουργία φακέλου προορισμού στον Server
+      ansible.builtin.file:
+        path: /opt/stratologia
+        state: directory
+        mode: '0755'
+
+    - name: 3. Αποστολή του κεντρικού docker-compose.yml στον Server
+      ansible.builtin.copy:
+        src: ../docker-compose.yml           # <--- Βλέπει στη ρίζα του repo!
+        dest: /opt/stratologia/docker-compose.yml
+        mode: '0644'
+
+    - name: 4. Εκκίνηση των Containers
+      ansible.builtin.command:
+        cmd: docker compose up -d
+        chdir: /opt/stratologia

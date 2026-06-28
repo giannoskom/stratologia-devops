@@ -1,0 +1,51 @@
+---
+- name: Εγκατάσταση Stratologia σε Linux VM
+  hosts: vm_servers
+  become: true
+
+  vars:
+    app_dir: "/opt/stratologia-backend"
+
+  tasks:
+    - name: 1. Εγκατάσταση Βασικών Πακέτων
+      ansible.builtin.apt:
+        name: [python3, python3-pip, python3-venv, git, postgresql, libpq-dev]
+        state: present
+        update_cache: true
+
+    - name: 2. Κλωνοποίηση του Repo
+      ansible.builtin.git:
+        repo: 'https://github.com/giannoskom/stratologia-devops.git'
+        dest: "{{ app_dir }}"
+        version: main
+
+    - name: 3. Setup Python venv
+      ansible.builtin.pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        virtualenv: "{{ app_dir }}/venv"
+        virtualenv_command: python3 -m venv
+
+    - name: 4. Δημιουργία Systemd Service
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/stratologia.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Stratologia Backend Daemon
+          After=network.target
+
+          [Service]
+          User=root
+          WorkingDirectory={{ app_dir }}
+          ExecStart={{ app_dir }}/venv/bin/python app.py
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: 5. Εκκίνηση του Service
+      ansible.builtin.systemd:
+        name: stratologia
+        state: restarted
+        enabled: true
+        daemon_reload: true
