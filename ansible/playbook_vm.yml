@@ -1,51 +1,125 @@
 ---
-- name: Εγκατάσταση Stratologia σε Linux VM
+- name: Εγκατάσταση των Components VM
   hosts: vm_servers
   become: true
 
   vars:
     app_dir: "/opt/stratologia-backend"
+    kc_dir: "/opt/keycloak"
 
   tasks:
-    - name: 1. Εγκατάσταση Βασικών Πακέτων
+    - name: 1. Εγκατάσταση βασικών πακέτων (Python, Postgres, Java 17)
       ansible.builtin.apt:
-        name: [python3, python3-pip, python3-venv, git, postgresql, libpq-dev]
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+          - git
+          - postgresql
+          - libpq-dev
+          - openjdk-17-jre-headless
+          - curl
         state: present
         update_cache: true
 
-    - name: 2. Κλωνοποίηση του Repo
-      ansible.builtin.git:
-        repo: 'https://github.com/giannoskom/stratologia-devops.git'
-        dest: "{{ app_dir }}"
-        version: main
+    - name: 2. Δημιουργία Χρήστη και Βάσης Δεδομένων στην PostgreSQL
+      ansible.builtin.shell: |
+        sudo -u postgres psql -tc "SELECT 1 FROM pg_user WHERE usename = 'stratologia_user'" | grep -q 1 || sudo -u postgres psql -c "CREATE USER stratologia_user WITH PASSWORD 'stratologia_pass';"
+        sudo -u postgres psql -tc "SELECT 1 FROM pg_database WHERE datname = 'stratologia_db'" | grep -q 1 || sudo -u postgres psql -c "CREATE DATABASE stratologia_db OWNER stratologia_user;"
+      changed_when: false
 
-    - name: 3. Setup Python venv
-      ansible.builtin.pip:
-        requirements: "{{ app_dir }}/requirements.txt"
-        virtualenv: "{{ app_dir }}/venv"
-        virtualenv_command: python3 -m venv
+    - name: 3. Κατέβασμα του MailHog
+      ansible.builtin.get_url:
+        url: https://github.com/mailhog/MailHog/releases/download/v1.0.1/MailHog_linux_amd64
+        dest: /usr/local/bin/mailhog
+        mode: '0755'
 
-    - name: 4. Δημιουργία Systemd Service
+    - name: 4. Δημιουργία Systemd Service για το MailHog
       ansible.builtin.copy:
-        dest: /etc/systemd/system/stratologia.service
+        dest: /etc/systemd/system/mailhog.service
         mode: '0644'
         content: |
           [Unit]
-          Description=Stratologia Backend Daemon
+          Description=MailHog SMTP Testing Server
           After=network.target
 
           [Service]
-          User=root
-          WorkingDirectory={{ app_dir }}
-          ExecStart={{ app_dir }}/venv/bin/python app.py
+          ExecStart=/usr/local/bin/mailhog
           Restart=always
 
           [Install]
           WantedBy=multi-user.target
 
-    - name: 5. Εκκίνηση του Service
+    - name: 5. Κατέβασμα και Αποσυμπίεση Keycloak v24
+      ansible.builtin.unarchive:
+        src: https://github.com/keycloak/keycloak/releases/download/24.0.1/keycloak-24.0.1.tar.gz
+        dest: /opt/
+        remote_src: true
+        creates: /opt/keycloak-24.0.1/bin/kc.sh
+
+    - name: 6. Δημιουργία Systemd Service για το Keycloak
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/keycloak.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Keycloak IAM Standalone Server
+          After=network.target
+
+          [Service]
+          Environment="KC_BOOTSTRAP_ADMIN_USERNAME=admin"
+          Environment="KC_BOOTSTRAP_ADMIN_PASSWORD=admin"
+          ExecStart=/opt/keycloak-24.0.1/bin/kc.sh start-dev --http-port=8080
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: 7. Κλωνοποίηση του API Git Repository
+      ansible.builtin.git:
+        repo: 'https://github.com/giannoskom/stratologia-devops.git'
+        dest: "{{ app_dir }}"
+        version: main
+
+    - name: 8. Setup Python Virtual Environment
+      ansible.builtin.pip:
+        requirements: "{{ app_dir }}/requirements.txt"
+        virtualenv: "{{ app_dir }}/venv"
+        virtualenv_command: python3 -m venv
+
+    - name: 9. Δημιουργία Systemd Service για το API
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/stratologia.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=Stratologia Flask Backend Daemon
+          After=network.target postgresql.service keycloak.service mailhog.service
+
+          [Service]
+          User=root
+          WorkingDirectory={{ app_dir }}
+          Environment="DB_HOST=127.0.0.1"
+          Environment="DB_PORT=5432"
+          Environment="DB_NAME=stratologia_db"
+          Environment="DB_USER=stratologia_user"
+          Environment="DB_PASS=stratologia_pass"
+          Environment="SMTP_HOST=127.0.0.1"
+          Environment="SMTP_PORT=1025"
+          Environment="KEYCLOAK_BACKEND_URL=http://127.0.0.1:8080"
+          ExecStart={{ app_dir }}/venv/bin/python app.py
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+          
+    - name: 10. Εκκίνηση όλων των Bare-Metal Υπηρεσιών
       ansible.builtin.systemd:
-        name: stratologia
+        name: "{{ item }}"
         state: restarted
         enabled: true
         daemon_reload: true
+      loop:
+        - mailhog
+        - keycloak
+        - stratologia
