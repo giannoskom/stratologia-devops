@@ -49,6 +49,7 @@ services:
       - KEYCLOAK_BACKEND_URL=http://keycloak:8080
       - APP_BASE_URL=https://it22050.duckdns.org
       - KEYCLOAK_AUTH_URL=https://it22050-auth.duckdns.org
+      - KEYCLOAK_CLIENT_SECRET=UtTbGbbh0RpxlxBvbMXojemYK1YCYWgY
     ports:
       - "5000:5000"
     depends_on:

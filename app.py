@@ -25,7 +25,7 @@ APP_BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:5000")
 # --- KEYCLOAK CONFIGURATION ---
 KEYCLOAK_CLIENT_ID = "stratologia"
 KEYCLOAK_CLIENT_SECRET = os.getenv(
-    "KEYCLOAK_CLIENT_SECRET", "pb0YRkeFRFkXK7kj6foiyXtJp8Yi3mmL"
+    "KEYCLOAK_CLIENT_SECRET", "UtTbGbbh0RpxlxBvbMXojemYK1YCYWgY"
 )
 KEYCLOAK_REALM = "stratologia-realm"
 
