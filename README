@@ -1,0 +1,63 @@
+Stratologia API - DevOps Project
+Αυτό το project αποτελεί την εργασία για το μάθημα «Βασικές έννοιες και εργαλεία DevOps» του Τμήματος Πληροφορικής & Τηλεματικής του Χαροκοπείου Πανεπιστημίου.
+
+Περιγραφή
+Η εφαρμογή "Στρατολογία API" αποτελεί ένα ολοκληρωμένο σύστημα διαχείρισης αιτήσεων πολιτών. Η υποδομή είναι πλήρως αυτοματοποιημένη μέσω Ansible, χρησιμοποιώντας Docker για containerization, Keycloak για ταυτοποίηση και Caddy ως Reverse Proxy για SSL Termination.
+
+Αρχιτεκτονική
+Το σύστημα βασίζεται σε microservices:
+
+API: Flask Backend (Python)
+
+Database: PostgreSQL
+
+IAM: Keycloak (OpenID Connect)
+
+EMAIL Testing: MailHog (SMTP Server)
+
+Proxy: Caddy (HTTPS/SSL Termination)
+
+Τεχνολογίες
+IaC: Ansible
+
+CI/CD: Jenkins
+
+Containerization: Docker & Docker Compose
+
+Cloud: DigitalOcean Droplet
+
+Networking: DuckDNS (it22050.duckdns.org)
+
+Deployment
+
+Το project υποστηρίζει πολλαπλά περιβάλλοντα μέσω Ansible:
+
+Kubernetes (k8s):
+
+ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+
+Docker Environment:
+
+ansible-playbook -i ansible/inventory.ini ansible/playbook_docker.yml
+
+Bare-Metal (Linux VM):
+
+ansible-playbook -i ansible/inventory.ini ansible/playbook_vm.yml
+
+Credentials
+
+Keycloak Admin: admin / admin
+
+Public URL (App): https://it22050.duckdns.org
+
+Public URL (Auth): https://it22050-auth.duckdns.org
+
+MailHog UI: http://it22050.duckdns.org:8025
+
+Σημειώσεις
+
+Το project αναπτύχθηκε με αρχιτεκτονική Monorepo.
+
+Η ασφάλεια των επικοινωνιών εξασφαλίζεται μέσω Caddy Reverse Proxy.
+
+Η αυτοματοποίηση του build/deploy επιτυγχάνεται μέσω Jenkins Pipelines.
