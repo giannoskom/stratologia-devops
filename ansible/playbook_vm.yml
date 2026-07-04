@@ -99,14 +99,24 @@
           [Service]
           User=root
           WorkingDirectory={{ app_dir }}
+          
+          # Database Variables
           Environment="DB_HOST=127.0.0.1"
           Environment="DB_PORT=5432"
           Environment="DB_NAME=stratologia_db"
           Environment="DB_USER=stratologia_user"
           Environment="DB_PASS=stratologia_pass"
+          
+          # SMTP/Mailhog Variables
           Environment="SMTP_HOST=127.0.0.1"
           Environment="SMTP_PORT=1025"
+          
+          # Keycloak & App URL Variables
           Environment="KEYCLOAK_BACKEND_URL=http://127.0.0.1:8080"
+          Environment="APP_BASE_URL=https://it22050.duckdns.org"
+          Environment="KEYCLOAK_AUTH_URL=https://it22050-auth.duckdns.org"
+          Environment="KEYCLOAK_CLIENT_SECRET=UtTbGbbh0RpxlxBvbMXojemYK1YCYWgY"
+          
           ExecStart={{ app_dir }}/venv/bin/python app.py
           Restart=always
 
