@@ -45,7 +45,7 @@ services:
       - SMTP_PORT=1025
       - KEYCLOAK_BACKEND_URL=http://keycloak:8080
       - APP_BASE_URL=https://it22050.duckdns.org
-      - KEYCLOAK_AUTH_URL=https://it22050.duckdns.org:8080
+      - KEYCLOAK_AUTH_URL=http://it22050.duckdns.org:8080
     ports:
       - "5000:5000"
     depends_on:
