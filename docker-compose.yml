@@ -32,7 +32,7 @@ services:
       - "8025:8025"
 
   api:
-    image: giannoskomninos/stratologia-api:latest  # <--- Η ΜΕΓΑΛΗ ΑΛΛΑΓΗ
+    image: giannoskomninos/stratologia-api:latest 
     container_name: stratologia_api
     restart: always
     environment:
@@ -44,6 +44,8 @@ services:
       - SMTP_HOST=mailhog
       - SMTP_PORT=1025
       - KEYCLOAK_BACKEND_URL=http://keycloak:8080
+      - APP_BASE_URL=https://it22050.duckdns.org
+      - KEYCLOAK_AUTH_URL=https://it22050.duckdns.org:8080
     ports:
       - "5000:5000"
     depends_on:
