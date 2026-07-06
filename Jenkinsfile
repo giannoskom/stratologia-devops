@@ -38,10 +38,10 @@ pipeline {
     
     post {
         success {
-            echo '🎉 ΕΠΙΤΥΧΙΑ: Το νέο API χτίστηκε και είναι Live στο Microk8s!'
+            echo 'ΕΠΙΤΥΧΙΑ: Το νέο API χτίστηκε και είναι Live στο Microk8s!'
         }
         failure {
-            echo '❌ ΑΠΟΤΥΧΙΑ: Το Pipeline έσκασε. Δείτε τα Console Output logs.'
+            echo 'ΑΠΟΤΥΧΙΑ: Το Pipeline έσκασε. Δείτε τα Console Output logs.'
         }
     }
 }
