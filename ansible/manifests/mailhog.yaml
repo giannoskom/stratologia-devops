@@ -1,5 +1,4 @@
 ---
-# 1. ΤΟ CONTAINER (Deployment)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,7 +23,6 @@ spec:
               containerPort: 8025
 
 ---
-# 2. Ο ΔΙΠΛΟΣ ΤΗΛΕΦΩΝΗΤΗΣ (Service)
 apiVersion: v1
 kind: Service
 metadata:
