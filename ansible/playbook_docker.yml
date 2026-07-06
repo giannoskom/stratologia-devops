@@ -20,7 +20,7 @@
 
     - name: 3. Αποστολή του κεντρικού docker-compose.yml στον Server
       ansible.builtin.copy:
-        src: ../docker-compose.yml           # <--- Βλέπει στη ρίζα του repo!
+        src: ../docker-compose.yml      
         dest: /opt/stratologia/docker-compose.yml
         mode: '0644'
 
