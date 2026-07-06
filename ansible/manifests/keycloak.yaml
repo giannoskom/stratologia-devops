@@ -1,5 +1,4 @@
 ---
-# 1. ΑΙΤΗΣΗ ΓΙΑ ΔΙΣΚΟ (PVC)
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -12,7 +11,6 @@ spec:
       storage: 1Gi
 
 ---
-# 2. ΤΟ CONTAINER (Deployment)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47,7 +45,6 @@ spec:
             claimName: keycloak-pvc
 
 ---
-# 3. Ο ΤΗΛΕΦΩΝΗΤΗΣ (Service)
 apiVersion: v1
 kind: Service
 metadata:
