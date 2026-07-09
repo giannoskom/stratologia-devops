@@ -35,13 +35,13 @@ spec:
             - name: SMTP_PORT
               value: "1025"
             - name: APP_BASE_URL
-              value: "http://localhost:5000"
+              value: "https://it22050.duckdns.org"
             - name: KEYCLOAK_AUTH_URL
-              value: "http://localhost:8080"
+              value: "https://it22050-auth.duckdns.org"
             - name: KEYCLOAK_BACKEND_URL
               value: "http://stratologia-keycloak:8080"
             - name: KEYCLOAK_CLIENT_SECRET
-              value: "pb0YRkeFRFkXK7kj6foiyXtJp8Yi3mmL"
+              value: "UtTbGbbh0RpxlxBvbMXojemYK1YCYWgY"
 
 ---
 apiVersion: v1
